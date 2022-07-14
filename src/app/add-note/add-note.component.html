@@ -1,0 +1,53 @@
+<script>
+  CKEDITOR.plugins.addExternal(
+    "exportpdf",
+    "./node_modules/ckeditor4-plugin-exportpdf/",
+    "https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"
+  );
+</script>
+<body>
+<div class="note">
+<div class="title">
+  <h1>{{ model.noteTitle }}</h1>
+  <button mat-raised-button color="primary" class="saveBtn" (click)="saveNote()">Save</button>
+</div>
+<div class="editor" *ngIf = "loaded">
+  <ckeditor
+  [config]="{ extraPlugins: 'exportpdf',height:800 }"
+  [(ngModel)]="model.noteText"
+  (ready)="editorInit($event)"
+></ckeditor>
+</div>
+</div>
+
+<div class="timer">
+  <button mat-raised-button color="primary" (click)="showTimerForm(); saveNote()">Add new timer</button>
+  <br />
+
+  <section class="addTimer" *ngIf="isShow">
+    <label>Timer Title</label><br />
+    <input matInput id="timerTitle" name="timerTitle" type="string" [(ngModel)]="newTimerTitle" placeholder="Enter timer name"/>
+    <br />
+    <label>Work session</label><br />
+    <input matInput id="workSessionHr" name="workSessionHr" type="number" [(ngModel)]="newWorkHr"/> Hr 
+    <input matInput id="workSessionMin" name="workSessionMin" type="number" [(ngModel)]="newWorkMin"/> Min 
+
+    <br />
+    <button mat-stroked-button color="primary"  (click)="addTimer(); saveNote()">Create</button>
+    <button mat-stroked-button (click)="closeTimerForm()">Cancel</button>
+  </section>
+
+<div class="userTimer" *ngFor = "let singleTimer of timers; let i = index">
+  <h1>{{singleTimer.timerTitle}}</h1>
+  <cd-timer #basicTimer class="bootstrap-timer"  [countdown]="true" [startTime]=singleTimer.timerDuration*60 (onComplete)="showNotification( 'default', singleTimer.timerTitle+' is over!' )">[hours]h [minutes]m [seconds]s
+  </cd-timer>
+  <div>
+    <button mat-stroked-button color="primary" (click)="resumeTimer(i); showNotification( 'info', singleTimer.timerTitle+' is started!' )">Start</button>
+    <button mat-stroked-button (click)="stopTimer(i); showNotification( 'info', singleTimer.timerTitle+' is stopped!')">Stop</button>
+  </div>
+</div>
+
+</div>
+</body>
+
+<notifier-container></notifier-container>
