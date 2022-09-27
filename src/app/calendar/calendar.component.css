@@ -1,3 +1,89 @@
-.sidebar{
-    color:green;
+
+#container{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow:hidden
 }
+.sidebar{
+    color: white;
+    height: 100%;  
+    flex: 1; 
+    background-color: #d677a5;
+    border-right: 2px solid #c5cae9;
+} 
+.cal{
+    flex:4;
+    overflow: scroll;
+}
+
+#day{
+font-size: 35px;
+padding-top: 30px;
+padding-left: 20px;
+}
+
+#date{
+    font-size: 35px;
+    padding-left: 40px;
+    padding-bottom: 20px;
+}
+
+#eventtext{
+    padding-left: 10px;
+}
+
+.time{
+    list-style-type: none;
+}
+
+.des{
+    list-style-type: none;
+}
+
+@media only screen and (max-width: 600px) {
+
+   
+#container{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow:hidden;
+    flex-direction:column;
+}
+.sidebar{
+    color: white;
+    height: 100%;  
+    flex: 1; 
+    background-color: #d677a5;
+    border-right: 2px solid #c5cae9;
+} 
+.cal{
+    flex:4;
+    overflow: scroll;
+    padding: 5px;
+}
+#day{
+    font-size: 15px;
+    padding: 0px;
+    margin: 0px 0px 0px 5px;
+    }
+    
+#date{
+    font-size: 15px;
+    padding: 0px;
+    margin: 0px 0px 0px 8px;
+}
+
+#eventtext{
+    font-size: 10px;
+    padding: 0px;
+    margin: 0px 0px 0px 5px;
+}
+
+
+ul{
+    margin: 0px 0px 0px 5px;
+}
+
+  }

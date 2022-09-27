@@ -8,19 +8,35 @@ import { CalendarComponent } from './calendar/calendar.component';
 import { GuardAuthService } from './guard-auth.service';
 import { AddNoteComponent } from './add-note/add-note.component';
 import { MyNotesComponent } from './my-notes/my-notes.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 const routes: Routes = [
-  { path: 'about', component: AboutComponent, canActivate: [GuardAuthService]},
-  { path: 'register', component: RegisterComponent},
-  { path: 'login', component: LoginComponent},
-  { path: '', component: LandingPageComponent},
-  { path: 'calendar', component: CalendarComponent, canActivate: [GuardAuthService]},
-  { path: 'note/:id', component: AddNoteComponent, canActivate: [GuardAuthService]},
-  { path: 'mynotes', component: MyNotesComponent, canActivate: [GuardAuthService]}
+  { path: 'about', component: AboutComponent, canActivate: [GuardAuthService] },
+  { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent },
+  { path: '', component: LandingPageComponent },
+  {
+    path: 'calendar',
+    component: CalendarComponent,
+    canActivate: [GuardAuthService],
+  },
+  {
+    path: 'note/:id',
+    component: AddNoteComponent,
+    canActivate: [GuardAuthService],
+  },
+  {
+    path: 'mynotes',
+    component: MyNotesComponent,
+    canActivate: [GuardAuthService],
+  },
+  { path: 'forgotPassword', component: ForgotPasswordComponent},
+  { path: 'reset/:token', component: ResetPasswordComponent}
   // { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

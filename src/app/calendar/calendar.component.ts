@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CalendarOptions, DateSelectArg, EventAddArg } from '@fullcalendar/angular'; // useful for typechecking
 import interactionPlugin from '@fullcalendar/interaction';
-import { Subscription } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { CalendarService } from '../calendar.service';
 // import Events from '../Single';
-// import SingleEvent from '../Single';
-// import RecurringEvent from '../Recurring';
+import SingleEvent from '../Single';
 import { EventFlexible } from '../Recurring';
 
 //events dialog
@@ -21,6 +20,8 @@ import { ConditionalExpr } from '@angular/compiler';
 
 //Note
 import { NotesService } from '../notes.service';
+import { AutofillMonitor } from '@angular/cdk/text-field';
+import { EditEventDetailsComponent } from '../edit-event-details/edit-event-details.component';
 
 
 @Component({
@@ -31,6 +32,10 @@ import { NotesService } from '../notes.service';
 export class CalendarComponent implements OnInit {
   eventTest:EventFlexible = { eventTitle:"", description:"", recurring:""}; // <---------
   
+  singleEventList!:any;
+  recurringEventList!:any;
+  today = new Date()
+
   constructor(private calService : CalendarService,public dialog:MatDialog, public noteService: NotesService) { }
   private calendarSub: Subscription | undefined;
 
@@ -53,6 +58,7 @@ export class CalendarComponent implements OnInit {
     initialView: 'dayGridMonth',
     editable: true,
     selectable: true,
+    height:"100%",
 
     select: this.handleDateSelect.bind(this), // bind is important!
     
@@ -200,7 +206,10 @@ export class CalendarComponent implements OnInit {
 
   handleEventDrop(info: any){
 
-    let dialogRef = this.dialog.open(DisplayEventDetailsComponent,{width:'400px',data:info})
+    let dialogRef = this.dialog.open(EditEventDetailsComponent, {
+      width: '400px',
+      data: info,
+      });
     
   }
 
@@ -210,6 +219,8 @@ export class CalendarComponent implements OnInit {
     this.calService.eventGetFromApi().subscribe(data=>{
 
       let events:Object[] = [];
+      let singleEvents = [];
+      let recurringEvents = [];
 
       for(let i=0;i<data.length;i++){
 
@@ -220,6 +231,18 @@ export class CalendarComponent implements OnInit {
         events.push(eventSingle);
         console.log(eventSingle.id);
 
+        
+        let localDate = new Date(data[i].start)
+        
+        if(localDate.toDateString() == this.today.toDateString()){
+          let e = {title:data[i].eventTitle,start:data[i].start,end:data[i].end,description:data[i].description}
+          
+          singleEvents.push(e);
+          this.singleEventList = singleEvents
+        }
+
+       
+
         //display recurring
 
         let eventRecurring = {id: data[i]._id,title:data[i].eventTitle,startTime:{years:0,months:0,days:0,milliseconds:data[i].startTime},
@@ -228,6 +251,47 @@ export class CalendarComponent implements OnInit {
         description: data[i].description, recurring: data[i].recurring}
 
         events.push(eventRecurring);
+
+        let localStartDate = new Date(data[i].startRecur)
+        let localEndDate = new Date(data[i].endRecur)
+        console.log(data[i].eventTitle+" start date: "+localStartDate)
+        if(localStartDate < this.today && localEndDate > this.today){
+          if(data[i].recurring == "daily" || data[i].daysOfWeek == this.today.getDay()){
+            let hStart = Math.round(parseInt(data[i].startTime)/3600000)
+            let mStart = (parseInt(data[i].startTime)%3600000) /60000
+            let hEnd = Math.round(parseInt(data[i].endTime)/3600000)
+            let mEnd = (parseInt(data[i].endTime)%3600000) /60000
+            let startTimeString;
+            let endTimeString;
+            if(hStart == 12){
+              startTimeString = "12:"+(mStart>10?mStart:'0'+mStart)+' PM'
+            }else if(hStart>12){
+              startTimeString = hStart-12+":"+(mStart>10?mStart:'0'+mStart)+' PM'
+            }else if(hStart=0){
+              startTimeString = "12:"+(mStart>10?mStart:'0'+mStart)+' AM'
+            }else{
+              startTimeString = hStart+":"+(mStart>10?mStart:'0'+mStart)+' AM'
+            }
+            if(hEnd == 12){
+              endTimeString = "12:"+(mEnd>10?mEnd:'0'+mEnd)+' PM'
+            }else if(hEnd>12){
+              endTimeString = hEnd-12+":"+(mEnd>10?mEnd:'0'+mEnd)+' PM'
+            }else if(hEnd=0){
+              endTimeString = "12:"+(mEnd>10?mEnd:'0'+mEnd)+' AM'
+            }else{
+              endTimeString = hEnd+":"+(mEnd>10?mEnd:'0'+mEnd)+' AM'
+            }
+
+
+            console.log(startTimeString+' - '+endTimeString)
+
+
+            let e = {title:data[i].eventTitle,startTime:startTimeString,endTime:endTimeString,description:data[i].description}
+
+            recurringEvents.push(e)
+            this.recurringEventList = recurringEvents
+          }
+        }
 
       }
 
